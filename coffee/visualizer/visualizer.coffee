@@ -9,7 +9,6 @@ Point = require '../geom/point'
 Rect = require '../geom/rect'
 Graphics = require './graphics'
 ToolMover = require './mover'
-ToolIntersectionMover = require './intersection-mover'
 ToolIntersectionBuilder = require './intersection-builder'
 ToolRoadBuilder = require './road-builder'
 ToolHighlighter = require './highlighter'
@@ -31,7 +30,6 @@ class Visualizer
     @toolRoadbuilder = new ToolRoadBuilder this, true
     @toolIntersectionBuilder = new ToolIntersectionBuilder this, true
     @toolHighlighter = new ToolHighlighter this, true
-    @toolIntersectionMover = new ToolIntersectionMover this, true
     @toolMover = new ToolMover this, true
     @_running = false
     @previousTime = 0

@@ -49,7 +49,7 @@ $(function() {
 });
 
 
-},{"./helpers":6,"./model/world":15,"./settings":16,"./visualizer/visualizer":24,"dat-gui":27,"jquery":31,"underscore":32}],2:[function(require,module,exports){
+},{"./helpers":6,"./model/world":15,"./settings":16,"./visualizer/visualizer":23,"dat-gui":26,"jquery":30,"underscore":31}],2:[function(require,module,exports){
 'use strict';
 var Curve, Segment;
 
@@ -303,7 +303,7 @@ Rect = (function() {
 module.exports = Rect;
 
 
-},{"../helpers":6,"./point":3,"./segment":5,"underscore":32}],5:[function(require,module,exports){
+},{"../helpers":6,"./point":3,"./segment":5,"underscore":31}],5:[function(require,module,exports){
 'use strict';
 var Segment;
 
@@ -554,7 +554,7 @@ Car = (function() {
 module.exports = Car;
 
 
-},{"../helpers":6,"./trajectory":14,"underscore":32}],8:[function(require,module,exports){
+},{"../helpers":6,"./trajectory":14,"underscore":31}],8:[function(require,module,exports){
 'use strict';
 var ControlSignals, random, settings,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -726,7 +726,7 @@ Intersection = (function() {
 module.exports = Intersection;
 
 
-},{"../geom/rect":4,"../helpers":6,"./control-signals":8,"underscore":32}],10:[function(require,module,exports){
+},{"../geom/rect":4,"../helpers":6,"./control-signals":8,"underscore":31}],10:[function(require,module,exports){
 'use strict';
 var LanePosition, _;
 
@@ -807,7 +807,7 @@ LanePosition = (function() {
 module.exports = LanePosition;
 
 
-},{"../helpers":6,"underscore":32}],11:[function(require,module,exports){
+},{"../helpers":6,"underscore":31}],11:[function(require,module,exports){
 'use strict';
 var Lane, Segment, _;
 
@@ -931,7 +931,7 @@ Lane = (function() {
 module.exports = Lane;
 
 
-},{"../geom/segment":5,"../helpers":6,"underscore":32}],12:[function(require,module,exports){
+},{"../geom/segment":5,"../helpers":6,"underscore":31}],12:[function(require,module,exports){
 'use strict';
 var Pool;
 
@@ -1109,7 +1109,7 @@ Road = (function() {
 module.exports = Road;
 
 
-},{"../helpers":6,"../settings":16,"./lane":11,"underscore":32}],14:[function(require,module,exports){
+},{"../helpers":6,"../settings":16,"./lane":11,"underscore":31}],14:[function(require,module,exports){
 'use strict';
 var Curve, LanePosition, Trajectory, max, min, _;
 
@@ -1368,7 +1368,7 @@ Trajectory = (function() {
 module.exports = Trajectory;
 
 
-},{"../geom/curve":2,"../helpers":6,"./lane-position":10,"underscore":32}],15:[function(require,module,exports){
+},{"../geom/curve":2,"../helpers":6,"./lane-position":10,"underscore":31}],15:[function(require,module,exports){
 'use strict';
 var Car, Intersection, Pool, Rect, Road, World, random, settings, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -1619,7 +1619,7 @@ World = (function() {
 module.exports = World;
 
 
-},{"../geom/rect":4,"../helpers":6,"../settings":16,"./car":7,"./intersection":9,"./pool":12,"./road":13,"underscore":32}],16:[function(require,module,exports){
+},{"../geom/rect":4,"../helpers":6,"../settings":16,"./car":7,"./intersection":9,"./pool":12,"./road":13,"underscore":31}],16:[function(require,module,exports){
 'use strict';
 var settings;
 
@@ -1849,7 +1849,7 @@ ToolHighlighter = (function(_super) {
 module.exports = ToolHighlighter;
 
 
-},{"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":23}],19:[function(require,module,exports){
+},{"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":22}],19:[function(require,module,exports){
 'use strict';
 var Intersection, Tool, ToolIntersectionBuilder,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -1918,64 +1918,7 @@ ToolIntersectionBuilder = (function(_super) {
 module.exports = ToolIntersectionBuilder;
 
 
-},{"../helpers.coffee":6,"../model/intersection.coffee":9,"./tool.coffee":23}],20:[function(require,module,exports){
-'use strict';
-var Tool, ToolIntersectionMover,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-require('../helpers.coffee');
-
-Tool = require('./tool.coffee');
-
-ToolIntersectionMover = (function(_super) {
-  __extends(ToolIntersectionMover, _super);
-
-  function ToolIntersectionMover() {
-    this.mouseout = __bind(this.mouseout, this);
-    this.mousemove = __bind(this.mousemove, this);
-    this.mouseup = __bind(this.mouseup, this);
-    this.mousedown = __bind(this.mousedown, this);
-    ToolIntersectionMover.__super__.constructor.apply(this, arguments);
-    this.intersection = null;
-  }
-
-  ToolIntersectionMover.prototype.mousedown = function(e) {
-    var intersection;
-    intersection = this.getHoveredIntersection(this.getCell(e));
-    if (intersection) {
-      this.intersection = intersection;
-      return e.stopImmediatePropagation();
-    }
-  };
-
-  ToolIntersectionMover.prototype.mouseup = function() {
-    return this.intersection = null;
-  };
-
-  ToolIntersectionMover.prototype.mousemove = function(e) {
-    var cell;
-    if (this.intersection) {
-      cell = this.getCell(e);
-      this.intersection.rect.left(cell.x);
-      this.intersection.rect.top(cell.y);
-      return this.intersection.update();
-    }
-  };
-
-  ToolIntersectionMover.prototype.mouseout = function() {
-    return this.intersection = null;
-  };
-
-  return ToolIntersectionMover;
-
-})(Tool);
-
-module.exports = ToolIntersectionMover;
-
-
-},{"../helpers.coffee":6,"./tool.coffee":23}],21:[function(require,module,exports){
+},{"../helpers.coffee":6,"../model/intersection.coffee":9,"./tool.coffee":22}],20:[function(require,module,exports){
 'use strict';
 var Mover, Tool,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2031,7 +1974,7 @@ Mover = (function(_super) {
 module.exports = Mover;
 
 
-},{"../helpers.coffee":6,"./tool.coffee":23}],22:[function(require,module,exports){
+},{"../helpers.coffee":6,"./tool.coffee":22}],21:[function(require,module,exports){
 'use strict';
 var Road, Tool, ToolRoadBuilder,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2116,7 +2059,7 @@ ToolRoadBuilder = (function(_super) {
 module.exports = ToolRoadBuilder;
 
 
-},{"../helpers.coffee":6,"../model/road.coffee":13,"./tool.coffee":23}],23:[function(require,module,exports){
+},{"../helpers.coffee":6,"../model/road.coffee":13,"./tool.coffee":22}],22:[function(require,module,exports){
 'use strict';
 var $, METHODS, Point, Rect, Tool, _;
 
@@ -2207,9 +2150,9 @@ Tool = (function() {
 module.exports = Tool;
 
 
-},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"jquery":31,"jquery-mousewheel":30,"underscore":32}],24:[function(require,module,exports){
+},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"jquery":30,"jquery-mousewheel":29,"underscore":31}],23:[function(require,module,exports){
 'use strict';
-var $, Graphics, PI, Point, Rect, ToolHighlighter, ToolIntersectionBuilder, ToolIntersectionMover, ToolMover, ToolRoadBuilder, Visualizer, Zoomer, chroma, settings, _,
+var $, Graphics, PI, Point, Rect, ToolHighlighter, ToolIntersectionBuilder, ToolMover, ToolRoadBuilder, Visualizer, Zoomer, chroma, settings, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 PI = Math.PI;
@@ -2229,8 +2172,6 @@ Rect = require('../geom/rect');
 Graphics = require('./graphics');
 
 ToolMover = require('./mover');
-
-ToolIntersectionMover = require('./intersection-mover');
 
 ToolIntersectionBuilder = require('./intersection-builder');
 
@@ -2257,7 +2198,6 @@ Visualizer = (function() {
     this.toolRoadbuilder = new ToolRoadBuilder(this, true);
     this.toolIntersectionBuilder = new ToolIntersectionBuilder(this, true);
     this.toolHighlighter = new ToolHighlighter(this, true);
-    this.toolIntersectionMover = new ToolIntersectionMover(this, true);
     this.toolMover = new ToolMover(this, true);
     this._running = false;
     this.previousTime = 0;
@@ -2477,7 +2417,7 @@ Visualizer = (function() {
 module.exports = Visualizer;
 
 
-},{"../geom/point":3,"../geom/rect":4,"../helpers":6,"../settings":16,"./graphics":17,"./highlighter":18,"./intersection-builder":19,"./intersection-mover":20,"./mover":21,"./road-builder":22,"./zoomer":25,"chroma-js":26,"jquery":31,"underscore":32}],25:[function(require,module,exports){
+},{"../geom/point":3,"../geom/rect":4,"../helpers":6,"../settings":16,"./graphics":17,"./highlighter":18,"./intersection-builder":19,"./mover":20,"./road-builder":21,"./zoomer":24,"chroma-js":25,"jquery":30,"underscore":31}],24:[function(require,module,exports){
 'use strict';
 var Point, Rect, Tool, Zoomer, max, min, settings,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2587,7 +2527,7 @@ Zoomer = (function(_super) {
 module.exports = Zoomer;
 
 
-},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":23}],26:[function(require,module,exports){
+},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":22}],25:[function(require,module,exports){
 // Generated by CoffeeScript 1.6.2
 /** echo  * @license echo  * while read i do echo  *  done echo
 */
@@ -4452,10 +4392,10 @@ module.exports = Zoomer;
 
 }).call(this);
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = require('./vendor/dat.gui')
 module.exports.color = require('./vendor/dat.color')
-},{"./vendor/dat.color":28,"./vendor/dat.gui":29}],28:[function(require,module,exports){
+},{"./vendor/dat.color":27,"./vendor/dat.gui":28}],27:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -5211,7 +5151,7 @@ dat.color.math = (function () {
 })(),
 dat.color.toString,
 dat.utils.common);
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -8872,13 +8812,13 @@ dat.dom.CenteredDiv = (function (dom, common) {
 dat.utils.common),
 dat.dom.dom,
 dat.utils.common);
-},{}],30:[function(require,module,exports){
-/*! Copyright (c) 2013 Brandon Aaron (http://brandon.aaron.sh)
- * Licensed under the MIT License (LICENSE.txt).
+},{}],29:[function(require,module,exports){
+/*!
+ * jQuery Mousewheel 3.1.13
  *
- * Version: 3.1.12
- *
- * Requires: jQuery 1.2.2+
+ * Copyright jQuery Foundation and other contributors
+ * Released under the MIT license
+ * http://jquery.org/license
  */
 
 (function (factory) {
@@ -9095,9 +9035,9 @@ dat.utils.common);
 
 }));
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
- * jQuery JavaScript Library v2.1.3
+ * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -9107,7 +9047,7 @@ dat.utils.common);
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2014-12-18T15:11Z
+ * Date: 2015-04-28T16:01Z
  */
 
 (function( global, factory ) {
@@ -9165,7 +9105,7 @@ var
 	// Use the correct document accordingly with window argument (sandbox)
 	document = window.document,
 
-	version = "2.1.3",
+	version = "2.1.4",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -9629,7 +9569,12 @@ jQuery.each("Boolean Number String Function Array Date RegExp Object Error".spli
 });
 
 function isArraylike( obj ) {
-	var length = obj.length,
+
+	// Support: iOS 8.2 (not reproducible in simulator)
+	// `in` check used to prevent JIT error (gh-2145)
+	// hasOwn isn't used here due to false negatives
+	// regarding Nodelist length in IE
+	var length = "length" in obj && obj.length,
 		type = jQuery.type( obj );
 
 	if ( type === "function" || jQuery.isWindow( obj ) ) {
@@ -18302,7 +18247,7 @@ return jQuery;
 
 }));
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
