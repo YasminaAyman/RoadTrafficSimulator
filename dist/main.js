@@ -2190,8 +2190,6 @@ Visualizer = (function() {
     this.$canvas = $('#canvas');
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext('2d');
-    this.carImage = new Image();
-    this.carImage.src = 'images/car.png';
     this.updateCanvasSize();
     this.zoomer = new Zoomer(4, this, true);
     this.graphics = new Graphics(this.ctx);

@@ -21,9 +21,6 @@ class Visualizer
     @canvas = @$canvas[0]
     @ctx = @canvas.getContext('2d')
 
-    @carImage = new Image()
-    @carImage.src = 'images/car.png'
-
     @updateCanvasSize()
     @zoomer = new Zoomer 4, this, true
     @graphics = new Graphics @ctx
@@ -131,7 +128,6 @@ class Visualizer
     @ctx.rotate angle
     l = 0.90 - 0.30 * car.speed / car.maxSpeed
     style = chroma(car.color, 0.8, l, 'hsl').hex()
-    # @graphics.drawImage @carImage, rect
     @graphics.fillRect boundRect, style
     @graphics.restore()
     if @debug
