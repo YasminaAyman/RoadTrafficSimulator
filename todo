@@ -1,0 +1,11 @@
+- [Nabil] Traffic
+	- Change car source from random to start form a house and have 3 options:
+		- Keep driving.
+		- Park (disappear) in the next house.
+		- Die (Make sudden surprising accident and show a pic of dead guy).
+	- Fix possible deadlocks in traffic.
+- [Yasmin] Model of blocks either: house, grass, hospital or anything.
+	- With the option to light the building up in case of need.
+	- With the option to set the building on fire.
+- Light system for cars, to light up the surroundings.
+- [Atef] Interface (Socket.io)
