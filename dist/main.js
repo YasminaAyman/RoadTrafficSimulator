@@ -34,22 +34,21 @@ $(function() {
   guiWorld = gui.addFolder('world');
   guiWorld.open();
   guiWorld.add(world, 'save');
-  guiWorld.add(world, 'load');
   guiWorld.add(world, 'clear');
-  guiWorld.add(world, 'generateMap');
   guiVisualizer = gui.addFolder('visualizer');
   guiVisualizer.open();
   guiVisualizer.add(visualizer, 'running').listen();
   guiVisualizer.add(visualizer, 'debug').listen();
+  guiVisualizer.add(visualizer, 'accident').listen();
   guiVisualizer.add(visualizer.zoomer, 'scale', 0.1, 2).listen();
   guiVisualizer.add(visualizer, 'timeFactor', 0.1, 10).listen();
-  guiWorld.add(world, 'carsNumber').min(0).max(200).step(1).listen();
+  world.carsNumber = 20;
   guiWorld.add(world, 'instantSpeed').step(0.00001).listen();
   return gui.add(settings, 'lightsFlipInterval', 0, 400, 0.01).listen();
 });
 
 
-},{"./helpers":6,"./model/world":15,"./settings":16,"./visualizer/visualizer":23,"dat-gui":26,"jquery":30,"underscore":31}],2:[function(require,module,exports){
+},{"./helpers":6,"./model/world":16,"./settings":17,"./visualizer/visualizer":24,"dat-gui":27,"jquery":31,"underscore":32}],2:[function(require,module,exports){
 'use strict';
 var Curve, Segment;
 
@@ -303,7 +302,7 @@ Rect = (function() {
 module.exports = Rect;
 
 
-},{"../helpers":6,"./point":3,"./segment":5,"underscore":31}],5:[function(require,module,exports){
+},{"../helpers":6,"./point":3,"./segment":5,"underscore":32}],5:[function(require,module,exports){
 'use strict';
 var Segment;
 
@@ -387,6 +386,44 @@ Function.prototype.property = function(prop, desc) {
 
 
 },{}],7:[function(require,module,exports){
+'use strict';
+var Building, Segment, max, min, random, sqrt, _;
+
+max = Math.max, min = Math.min, random = Math.random, sqrt = Math.sqrt;
+
+require('../helpers');
+
+_ = require('underscore');
+
+Segment = require('../geom/segment');
+
+Building = (function() {
+  function Building(xC, yC) {
+    this.xC = xC;
+    this.yC = yC;
+    this.id = _.uniqueId('road');
+    this.type = random();
+    this.xCoor = xC;
+    this.yCoor = yC;
+  }
+
+  return Building;
+
+})();
+
+({
+  toJSON: function() {
+    var obj;
+    return obj = {
+      id: this.id
+    };
+  }
+});
+
+module.exports = Building;
+
+
+},{"../geom/segment":5,"../helpers":6,"underscore":32}],8:[function(require,module,exports){
 'use strict';
 var Car, Trajectory, max, min, random, sqrt, _;
 
@@ -554,7 +591,7 @@ Car = (function() {
 module.exports = Car;
 
 
-},{"../helpers":6,"./trajectory":14,"underscore":31}],8:[function(require,module,exports){
+},{"../helpers":6,"./trajectory":15,"underscore":32}],9:[function(require,module,exports){
 'use strict';
 var ControlSignals, random, settings,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -662,7 +699,7 @@ ControlSignals = (function() {
 module.exports = ControlSignals;
 
 
-},{"../helpers":6,"../settings":16}],9:[function(require,module,exports){
+},{"../helpers":6,"../settings":17}],10:[function(require,module,exports){
 'use strict';
 var ControlSignals, Intersection, Rect, _;
 
@@ -705,6 +742,7 @@ Intersection = (function() {
 
   Intersection.prototype.update = function() {
     var road, _i, _j, _len, _len1, _ref, _ref1, _results;
+    road.intersec = 1;
     _ref = this.roads;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       road = _ref[_i];
@@ -726,7 +764,7 @@ Intersection = (function() {
 module.exports = Intersection;
 
 
-},{"../geom/rect":4,"../helpers":6,"./control-signals":8,"underscore":31}],10:[function(require,module,exports){
+},{"../geom/rect":4,"../helpers":6,"./control-signals":9,"underscore":32}],11:[function(require,module,exports){
 'use strict';
 var LanePosition, _;
 
@@ -807,7 +845,7 @@ LanePosition = (function() {
 module.exports = LanePosition;
 
 
-},{"../helpers":6,"underscore":31}],11:[function(require,module,exports){
+},{"../helpers":6,"underscore":32}],12:[function(require,module,exports){
 'use strict';
 var Lane, Segment, _;
 
@@ -931,7 +969,7 @@ Lane = (function() {
 module.exports = Lane;
 
 
-},{"../geom/segment":5,"../helpers":6,"underscore":31}],12:[function(require,module,exports){
+},{"../geom/segment":5,"../helpers":6,"underscore":32}],13:[function(require,module,exports){
 'use strict';
 var Pool;
 
@@ -995,7 +1033,7 @@ Pool = (function() {
 module.exports = Pool;
 
 
-},{"../helpers":6}],13:[function(require,module,exports){
+},{"../helpers":6}],14:[function(require,module,exports){
 'use strict';
 var Lane, Road, max, min, settings, _;
 
@@ -1017,6 +1055,7 @@ Road = (function() {
     this.lanes = [];
     this.lanesNumber = null;
     this.update();
+    this.intersec = 0;
   }
 
   Road.copy = function(road) {
@@ -1109,7 +1148,7 @@ Road = (function() {
 module.exports = Road;
 
 
-},{"../helpers":6,"../settings":16,"./lane":11,"underscore":31}],14:[function(require,module,exports){
+},{"../helpers":6,"../settings":17,"./lane":12,"underscore":32}],15:[function(require,module,exports){
 'use strict';
 var Curve, LanePosition, Trajectory, max, min, _;
 
@@ -1368,9 +1407,9 @@ Trajectory = (function() {
 module.exports = Trajectory;
 
 
-},{"../geom/curve":2,"../helpers":6,"./lane-position":10,"underscore":31}],15:[function(require,module,exports){
+},{"../geom/curve":2,"../helpers":6,"./lane-position":11,"underscore":32}],16:[function(require,module,exports){
 'use strict';
-var Car, Intersection, Pool, Rect, Road, World, random, settings, _,
+var Building, Car, Intersection, Pool, Rect, Road, World, random, settings, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 random = Math.random;
@@ -1390,6 +1429,8 @@ Pool = require('./pool');
 Rect = require('../geom/rect');
 
 settings = require('../settings');
+
+Building = require('./building');
 
 World = (function() {
   function World() {
@@ -1419,6 +1460,7 @@ World = (function() {
     this.intersections = new Pool(Intersection, obj.intersections);
     this.roads = new Pool(Road, obj.roads);
     this.cars = new Pool(Car, obj.cars);
+    this.buildings = new Pool(Building, obj.buildings);
     this.carsNumber = 0;
     return this.time = 0;
   };
@@ -1457,7 +1499,7 @@ World = (function() {
   };
 
   World.prototype.generateMap = function(minX, maxX, minY, maxY) {
-    var gridSize, intersection, intersectionsNumber, map, previous, rect, step, x, y, _i, _j, _k, _l;
+    var gridSize, intersection, intersectionsNumber, map, previous, rand, rect, step, x, y, _i, _j, _k, _l, _m, _n;
     if (minX == null) {
       minX = -2;
     }
@@ -1474,47 +1516,45 @@ World = (function() {
     intersectionsNumber = (0.8 * (maxX - minX + 1) * (maxY - minY + 1)) | 0;
     map = {};
     gridSize = settings.gridSize;
-    step = 5 * gridSize;
-    this.carsNumber = 100;
-    while (intersectionsNumber > 0) {
-      x = _.random(minX, maxX);
-      y = _.random(minY, maxY);
-      if (map[[x, y]] == null) {
-        rect = new Rect(step * x, step * y, gridSize, gridSize);
-        intersection = new Intersection(rect);
-        this.addIntersection(map[[x, y]] = intersection);
-        intersectionsNumber -= 1;
+    step = 3 * gridSize;
+    this.carsNumber = 20;
+    for (x = _i = -2; _i < 3; x = ++_i) {
+      for (y = _j = -2; _j < 3; y = ++_j) {
+        if (map[[x, y]] == null) {
+          rect = new Rect(step * x, step * y, gridSize, gridSize);
+          intersection = new Intersection(rect);
+          this.addIntersection(map[[x, y]] = intersection);
+          intersectionsNumber -= 1;
+        }
       }
     }
-    for (x = _i = minX; minX <= maxX ? _i <= maxX : _i >= maxX; x = minX <= maxX ? ++_i : --_i) {
+    for (x = _k = minX; minX <= maxX ? _k <= maxX : _k >= maxX; x = minX <= maxX ? ++_k : --_k) {
       previous = null;
-      for (y = _j = minY; minY <= maxY ? _j <= maxY : _j >= maxY; y = minY <= maxY ? ++_j : --_j) {
+      for (y = _l = minY; minY <= maxY ? _l <= maxY : _l >= maxY; y = minY <= maxY ? ++_l : --_l) {
         intersection = map[[x, y]];
         if (intersection != null) {
-          if (random() < 0.9) {
-            if (previous != null) {
-              this.addRoad(new Road(intersection, previous));
-            }
-            if (previous != null) {
-              this.addRoad(new Road(previous, intersection));
-            }
+          rand = random();
+          if (previous != null) {
+            this.addRoad(new Road(intersection, previous));
+          }
+          if (previous != null) {
+            this.addRoad(new Road(previous, intersection));
           }
           previous = intersection;
         }
       }
     }
-    for (y = _k = minY; minY <= maxY ? _k <= maxY : _k >= maxY; y = minY <= maxY ? ++_k : --_k) {
+    for (y = _m = minY; minY <= maxY ? _m <= maxY : _m >= maxY; y = minY <= maxY ? ++_m : --_m) {
       previous = null;
-      for (x = _l = minX; minX <= maxX ? _l <= maxX : _l >= maxX; x = minX <= maxX ? ++_l : --_l) {
+      for (x = _n = minX; minX <= maxX ? _n <= maxX : _n >= maxX; x = minX <= maxX ? ++_n : --_n) {
         intersection = map[[x, y]];
         if (intersection != null) {
-          if (random() < 0.9) {
-            if (previous != null) {
-              this.addRoad(new Road(intersection, previous));
-            }
-            if (previous != null) {
-              this.addRoad(new Road(previous, intersection));
-            }
+          rand = random();
+          if (previous != null) {
+            this.addRoad(new Road(intersection, previous));
+          }
+          if (previous != null) {
+            this.addRoad(new Road(previous, intersection));
           }
           previous = intersection;
         }
@@ -1560,6 +1600,10 @@ World = (function() {
     if (this.cars.length > this.carsNumber) {
       return this.removeRandomCar();
     }
+  };
+
+  World.prototype.addBuilding = function(building) {
+    return this.buildings.put(building);
   };
 
   World.prototype.addRoad = function(road) {
@@ -1619,13 +1663,13 @@ World = (function() {
 module.exports = World;
 
 
-},{"../geom/rect":4,"../helpers":6,"../settings":16,"./car":7,"./intersection":9,"./pool":12,"./road":13,"underscore":31}],16:[function(require,module,exports){
+},{"../geom/rect":4,"../helpers":6,"../settings":17,"./building":7,"./car":8,"./intersection":10,"./pool":13,"./road":14,"underscore":32}],17:[function(require,module,exports){
 'use strict';
 var settings;
 
 settings = {
   colors: {
-    background: '#97a1a1',
+    background: '#2ECC71',
     redLight: 'hsl(0, 100%, 50%)',
     greenLight: '#85ee00',
     intersection: '#586970',
@@ -1633,6 +1677,12 @@ settings = {
     roadMarking: '#bbb',
     hoveredIntersection: '#3d4c53',
     tempRoad: '#aaa',
+    house: '#F8C471',
+    hospital: '#FBFCFC',
+    police: '#2E4053',
+    fire: '#E74C3C',
+    grass: '#27AE60',
+    lights: '#F6F613',
     gridPoint: '#586970',
     grid1: 'rgba(255, 255, 255, 0.5)',
     grid2: 'rgba(220, 220, 220, 0.5)',
@@ -1647,7 +1697,7 @@ settings = {
 module.exports = settings;
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 var Graphics, PI,
   __slice = [].slice;
@@ -1662,6 +1712,19 @@ Graphics = (function() {
   }
 
   Graphics.prototype.fillRect = function(rect, style, alpha) {
+    var _alpha;
+    if (style != null) {
+      this.ctx.fillStyle = style;
+    }
+    _alpha = this.ctx.globalAlpha;
+    if (alpha != null) {
+      this.ctx.globalAlpha = alpha;
+    }
+    this.ctx.fillRect(rect.left(), rect.top(), rect.width(), rect.height());
+    return this.ctx.globalAlpha = _alpha;
+  };
+
+  Graphics.prototype.fillOneRect = function(rect, style, alpha) {
     var _alpha;
     if (style != null) {
       this.ctx.fillStyle = style;
@@ -1791,7 +1854,7 @@ Graphics = (function() {
 module.exports = Graphics;
 
 
-},{"../helpers.coffee":6}],18:[function(require,module,exports){
+},{"../helpers.coffee":6}],19:[function(require,module,exports){
 'use strict';
 var Tool, ToolHighlighter, settings,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -1849,7 +1912,7 @@ ToolHighlighter = (function(_super) {
 module.exports = ToolHighlighter;
 
 
-},{"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":22}],19:[function(require,module,exports){
+},{"../helpers.coffee":6,"../settings.coffee":17,"./tool.coffee":23}],20:[function(require,module,exports){
 'use strict';
 var Intersection, Tool, ToolIntersectionBuilder,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -1918,7 +1981,7 @@ ToolIntersectionBuilder = (function(_super) {
 module.exports = ToolIntersectionBuilder;
 
 
-},{"../helpers.coffee":6,"../model/intersection.coffee":9,"./tool.coffee":22}],20:[function(require,module,exports){
+},{"../helpers.coffee":6,"../model/intersection.coffee":10,"./tool.coffee":23}],21:[function(require,module,exports){
 'use strict';
 var Mover, Tool,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -1974,7 +2037,7 @@ Mover = (function(_super) {
 module.exports = Mover;
 
 
-},{"../helpers.coffee":6,"./tool.coffee":22}],21:[function(require,module,exports){
+},{"../helpers.coffee":6,"./tool.coffee":23}],22:[function(require,module,exports){
 'use strict';
 var Road, Tool, ToolRoadBuilder,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2059,7 +2122,7 @@ ToolRoadBuilder = (function(_super) {
 module.exports = ToolRoadBuilder;
 
 
-},{"../helpers.coffee":6,"../model/road.coffee":13,"./tool.coffee":22}],22:[function(require,module,exports){
+},{"../helpers.coffee":6,"../model/road.coffee":14,"./tool.coffee":23}],23:[function(require,module,exports){
 'use strict';
 var $, METHODS, Point, Rect, Tool, _;
 
@@ -2150,12 +2213,14 @@ Tool = (function() {
 module.exports = Tool;
 
 
-},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"jquery":30,"jquery-mousewheel":29,"underscore":31}],23:[function(require,module,exports){
+},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"jquery":31,"jquery-mousewheel":30,"underscore":32}],24:[function(require,module,exports){
 'use strict';
-var $, Graphics, PI, Point, Rect, ToolHighlighter, ToolIntersectionBuilder, ToolMover, ToolRoadBuilder, Visualizer, Zoomer, chroma, settings, _,
+var $, Car, Graphics, PI, Point, Pool, Rect, ToolHighlighter, ToolIntersectionBuilder, ToolMover, ToolRoadBuilder, Visualizer, Zoomer, chroma, random, settings, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 PI = Math.PI;
+
+random = Math.random;
 
 require('../helpers');
 
@@ -2183,6 +2248,10 @@ Zoomer = require('./zoomer');
 
 settings = require('../settings');
 
+Car = require('../model/car');
+
+Pool = require('../model/pool');
+
 Visualizer = (function() {
   function Visualizer(world) {
     this.world = world;
@@ -2190,6 +2259,13 @@ Visualizer = (function() {
     this.$canvas = $('#canvas');
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext('2d');
+    this.hosp_x = 0;
+    this.hosp_y = 0;
+    this.police_x = 0;
+    this.police_y = 0;
+    this.fire_x = 0;
+    this.fire_y = 0;
+    this.hosp_road = null;
     this.updateCanvasSize();
     this.zoomer = new Zoomer(4, this, true);
     this.graphics = new Graphics(this.ctx);
@@ -2201,6 +2277,10 @@ Visualizer = (function() {
     this.previousTime = 0;
     this.timeFactor = settings.defaultTimeFactor;
     this.debug = false;
+    this.decide = false;
+    this.accident = false;
+    this.police = false;
+    this.fire = false;
   }
 
   Visualizer.prototype.drawIntersection = function(intersection, alpha) {
@@ -2309,27 +2389,61 @@ Visualizer = (function() {
   };
 
   Visualizer.prototype.drawGrid = function() {
-    var box, gridSize, i, j, rect, sz, _i, _ref, _ref1, _results;
+    var box, gridSize, i, id, j, rand, rect, rect1, rect2, rect3, road, sz, _i, _j, _ref, _ref1, _ref2, _ref3, _ref4;
     gridSize = settings.gridSize;
     box = this.zoomer.getBoundingBox();
     if (box.area() >= 2000 * gridSize * gridSize) {
       return;
     }
     sz = 0.4;
-    _results = [];
-    for (i = _i = _ref = box.left(), _ref1 = box.right(); gridSize > 0 ? _i <= _ref1 : _i >= _ref1; i = _i += gridSize) {
-      _results.push((function() {
-        var _j, _ref2, _ref3, _results1;
-        _results1 = [];
-        for (j = _j = _ref2 = box.top(), _ref3 = box.bottom(); gridSize > 0 ? _j <= _ref3 : _j >= _ref3; j = _j += gridSize) {
-          rect = new Rect(i - sz / 2, j - sz / 2, sz, sz);
-          _results1.push(this.graphics.fillRect(rect, settings.colors.gridPoint));
+    for (i = _i = _ref = box.left(), _ref1 = box.right(); _i <= _ref1; i = _i += 7) {
+      for (j = _j = _ref2 = box.top(), _ref3 = box.bottom(); _j <= _ref3; j = _j += 7) {
+        _ref4 = this.world.roads.all();
+        for (id in _ref4) {
+          road = _ref4[id];
+          if (i >= road.sourceSide.source.x && i <= road.sourceSide.target.x && j >= road.targetSide.target.y && j <= road.sourceSide.source.y) {
+            rect = new Rect(i - sz / 2, j - sz / 2, sz, sz);
+            this.graphics.fillRect(rect, settings.colors.lights);
+            if (!((j === road.targetSide.target.y) || (j === road.sourceSide.target.y) || road.intersec === 1)) {
+              rect = new Rect(i + 7, j, 5, 5);
+              this.graphics.fillOneRect(rect, settings.colors.house);
+              rect1 = new Rect(i - 21, j, 5, 5);
+              this.graphics.fillOneRect(rect1, settings.colors.house);
+              rand = random();
+              if (rand > 0.5 && this.decide === false) {
+                this.hosp_x = i;
+                this.hosp_y = j;
+                this.decide = true;
+                this.hosp_road = road;
+              }
+              if (rand > 0.5 && rand > 0.5 && this.police === false && this.decide === true && i !== this.hosp_x) {
+                this.police_x = i;
+                this.police_y = j;
+                this.police = true;
+              }
+              if (rand > 0.5 && this.fire === false && this.decide === true && i !== this.police_x && i !== this.hosp_x) {
+                this.fire_x = i;
+                this.fire_y = j;
+                this.fire = true;
+              }
+            }
+          }
+          if (i >= road.targetSide.target.x && i <= road.sourceSide.source.x && j >= road.targetSide.source.y && j <= road.targetSide.target.y) {
+            rect = new Rect(i - sz / 2, j - sz / 2, sz, sz);
+            this.graphics.fillRect(rect, settings.colors.lights);
+          }
         }
-        return _results1;
-      }).call(this));
+      }
     }
-    return _results;
+    rect1 = new Rect(this.hosp_x + 7, this.hosp_y, 5, 5);
+    this.graphics.fillRect(rect1, settings.colors.hospital);
+    rect2 = new Rect(this.police_x + 7, this.police_y, 5, 5);
+    this.graphics.fillRect(rect2, settings.colors.police);
+    rect3 = new Rect(this.fire_x + 7, this.fire_y, 5, 5);
+    return this.graphics.fillRect(rect3, settings.colors.fire);
   };
+
+  Visualizer.prototype.drawBuilding = function(building) {};
 
   Visualizer.prototype.updateCanvasSize = function() {
     if (this.$canvas.attr('width') !== $(window).width || this.$canvas.attr('height') !== $(window).height) {
@@ -2341,7 +2455,7 @@ Visualizer = (function() {
   };
 
   Visualizer.prototype.draw = function(time) {
-    var car, delta, id, intersection, road, _ref, _ref1, _ref2, _ref3;
+    var building, car, delta, id, intersection, road, _ref, _ref1, _ref2, _ref3, _ref4;
     delta = (time - this.previousTime) || 0;
     if (delta > 30) {
       if (delta > 100) {
@@ -2353,7 +2467,6 @@ Visualizer = (function() {
       this.graphics.clear(settings.colors.background);
       this.graphics.save();
       this.zoomer.transform();
-      this.drawGrid();
       _ref = this.world.intersections.all();
       for (id in _ref) {
         intersection = _ref[id];
@@ -2364,16 +2477,22 @@ Visualizer = (function() {
         road = _ref1[id];
         this.drawRoad(road, 0.9);
       }
-      _ref2 = this.world.roads.all();
+      _ref2 = this.world.buildings.all();
       for (id in _ref2) {
-        road = _ref2[id];
+        building = _ref2[id];
+        this.drawBuilding(building);
+      }
+      _ref3 = this.world.roads.all();
+      for (id in _ref3) {
+        road = _ref3[id];
         this.drawSignals(road);
       }
-      _ref3 = this.world.cars.all();
-      for (id in _ref3) {
-        car = _ref3[id];
+      _ref4 = this.world.cars.all();
+      for (id in _ref4) {
+        car = _ref4[id];
         this.drawCar(car);
       }
+      this.drawGrid();
       this.toolIntersectionBuilder.draw();
       this.toolRoadbuilder.draw();
       this.toolHighlighter.draw();
@@ -2397,6 +2516,20 @@ Visualizer = (function() {
     }
   });
 
+  Visualizer.property('accident', {
+    get: function() {
+      return this._accident;
+    },
+    set: function(accident) {
+      console.log("heree ##!!!!!!!!!!!!!!!!!!!");
+      if (accident) {
+        return this.removeAllCars();
+      } else {
+        return this.continueCars();
+      }
+    }
+  });
+
   Visualizer.prototype.start = function() {
     if (!this._running) {
       this._running = true;
@@ -2408,6 +2541,25 @@ Visualizer = (function() {
     return this._running = false;
   };
 
+  Visualizer.prototype.removeAllCars = function() {
+    var lane, roadHospital;
+    if (!this._accident) {
+      this._accident = true;
+      this.world.carsNumber = 1;
+      roadHospital = this.world.hosproad;
+      lane = _.sample(roadHospital.lanes);
+      this.world.cars = new Pool(Car);
+      this.world.addCar(new Car(lane));
+      return this.draw;
+    }
+  };
+
+  Visualizer.prototype.continueCars = function() {
+    console.log("thereeeeeee" + this._accident);
+    this.world.carsNumber = 20;
+    return this._accident = false;
+  };
+
   return Visualizer;
 
 })();
@@ -2415,7 +2567,7 @@ Visualizer = (function() {
 module.exports = Visualizer;
 
 
-},{"../geom/point":3,"../geom/rect":4,"../helpers":6,"../settings":16,"./graphics":17,"./highlighter":18,"./intersection-builder":19,"./mover":20,"./road-builder":21,"./zoomer":24,"chroma-js":25,"jquery":30,"underscore":31}],24:[function(require,module,exports){
+},{"../geom/point":3,"../geom/rect":4,"../helpers":6,"../model/car":8,"../model/pool":13,"../settings":17,"./graphics":18,"./highlighter":19,"./intersection-builder":20,"./mover":21,"./road-builder":22,"./zoomer":25,"chroma-js":26,"jquery":31,"underscore":32}],25:[function(require,module,exports){
 'use strict';
 var Point, Rect, Tool, Zoomer, max, min, settings,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2525,7 +2677,7 @@ Zoomer = (function(_super) {
 module.exports = Zoomer;
 
 
-},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"../settings.coffee":16,"./tool.coffee":22}],25:[function(require,module,exports){
+},{"../geom/point.coffee":3,"../geom/rect.coffee":4,"../helpers.coffee":6,"../settings.coffee":17,"./tool.coffee":23}],26:[function(require,module,exports){
 // Generated by CoffeeScript 1.6.2
 /** echo  * @license echo  * while read i do echo  *  done echo
 */
@@ -4390,10 +4542,10 @@ module.exports = Zoomer;
 
 }).call(this);
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = require('./vendor/dat.gui')
 module.exports.color = require('./vendor/dat.color')
-},{"./vendor/dat.color":27,"./vendor/dat.gui":28}],27:[function(require,module,exports){
+},{"./vendor/dat.color":28,"./vendor/dat.gui":29}],28:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -5149,7 +5301,7 @@ dat.color.math = (function () {
 })(),
 dat.color.toString,
 dat.utils.common);
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -8810,7 +8962,7 @@ dat.dom.CenteredDiv = (function (dom, common) {
 dat.utils.common),
 dat.dom.dom,
 dat.utils.common);
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * jQuery Mousewheel 3.1.13
  *
@@ -9033,7 +9185,7 @@ dat.utils.common);
 
 }));
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -18245,7 +18397,7 @@ return jQuery;
 
 }));
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

@@ -13,6 +13,14 @@ class Graphics
     @ctx.fillRect rect.left(), rect.top(), rect.width(), rect.height()
     @ctx.globalAlpha = _alpha
 
+  fillOneRect: (rect, style, alpha) ->
+    @ctx.fillStyle = style if style?
+    _alpha = @ctx.globalAlpha
+    @ctx.globalAlpha = alpha if alpha?
+    @ctx.fillRect rect.left(),rect.top(),rect.width(),rect.height()
+    @ctx.globalAlpha = _alpha
+
+
   drawRect: (rect) ->
     @ctx.beginPath
     vertices = rect.getVertices()

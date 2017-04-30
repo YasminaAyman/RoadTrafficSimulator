@@ -28,6 +28,7 @@ class Intersection
       controlSignals: @controlSignals
 
   update: ->
+    road.intersec = 1
     road.update() for road in @roads
     road.update() for road in @inRoads
 

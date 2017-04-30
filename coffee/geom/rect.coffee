@@ -48,6 +48,7 @@ class Rect
       @y = center.y - @height() / 2
     new Point @x + @width() / 2, @y + @height() / 2
 
+
   containsPoint: (point) ->
     @left() <= point.x <= @right() and @top() <= point.y <= @bottom()
 

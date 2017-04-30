@@ -2,7 +2,7 @@
 
 settings =
   colors:
-    background: '#97a1a1'
+    background: '#2ECC71'
     redLight: 'hsl(0, 100%, 50%)'
     greenLight: '#85ee00'
     intersection: '#586970'
@@ -10,6 +10,12 @@ settings =
     roadMarking: '#bbb'
     hoveredIntersection: '#3d4c53'
     tempRoad: '#aaa'
+    house: '#F8C471'
+    hospital: '#FBFCFC'
+    police: '#2E4053'
+    fire: '#E74C3C'
+    grass: '#27AE60'
+    lights: '#F6F613'
     gridPoint: '#586970'
     grid1: 'rgba(255, 255, 255, 0.5)'
     grid2: 'rgba(220, 220, 220, 0.5)'

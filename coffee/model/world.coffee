@@ -9,6 +9,7 @@ Road = require './road'
 Pool = require './pool'
 Rect = require '../geom/rect'
 settings = require '../settings'
+Building = require './building'
 
 class World
   constructor: ->
@@ -25,6 +26,7 @@ class World
     @intersections = new Pool Intersection, obj.intersections
     @roads = new Pool Road, obj.roads
     @cars = new Pool Car, obj.cars
+    @buildings = new Pool Building, obj.buildings
     @carsNumber = 0
     @time = 0
 
@@ -52,34 +54,43 @@ class World
     intersectionsNumber = (0.8 * (maxX - minX + 1) * (maxY - minY + 1)) | 0
     map = {}
     gridSize = settings.gridSize
-    step = 5 * gridSize
-    @carsNumber = 100
-    while intersectionsNumber > 0
-      x = _.random minX, maxX
-      y = _.random minY, maxY
-      unless map[[x, y]]?
-        rect = new Rect step * x, step * y, gridSize, gridSize
-        intersection = new Intersection rect
-        @addIntersection map[[x, y]] = intersection
-        intersectionsNumber -= 1
+    step = 3 * gridSize
+    @carsNumber = 20
+    for x in [-2...3]
+      for y in [-2...3]
+      # x = _.random minX, maxX
+      # y = _.random minY, maxY
+        unless map[[x, y]]?
+          rect = new Rect step * x, step * y, gridSize, gridSize
+          intersection = new Intersection rect
+          @addIntersection map[[x, y]] = intersection
+          intersectionsNumber -= 1
     for x in [minX..maxX]
       previous = null
       for y in [minY..maxY]
         intersection = map[[x, y]]
         if intersection?
-          if random() < 0.9
-            @addRoad new Road intersection, previous if previous?
-            @addRoad new Road previous, intersection if previous?
+          rand= random()
+          #if rand < 0.9
+          @addRoad new Road intersection, previous if previous?
+          @addRoad new Road previous, intersection if previous?
           previous = intersection
+        #unless intersection?
+          #@addBuilding new Building x , y
+
     for y in [minY..maxY]
       previous = null
       for x in [minX..maxX]
         intersection = map[[x, y]]
         if intersection?
-          if random() < 0.9
-            @addRoad new Road intersection, previous if previous?
-            @addRoad new Road previous, intersection if previous?
+          rand = random()
+          #if rand < 0.9
+          @addRoad new Road intersection, previous if previous?
+          @addRoad new Road previous, intersection if previous?
           previous = intersection
+        #unless intersection?
+          #@addBuilding new Building x , y
+
     null
 
 
@@ -100,6 +111,10 @@ class World
     @addRandomCar() if @cars.length < @carsNumber
     @removeRandomCar() if @cars.length > @carsNumber
 
+
+  addBuilding: (building) ->
+    @buildings.put building
+
   addRoad: (road) ->
     @roads.put road
     road.source.roads.push road
@@ -107,10 +122,11 @@ class World
     road.update()
 
   getRoad: (id) ->
-    @roads.get id
+     @roads.get id
 
   addCar: (car) ->
     @cars.put car
+  
 
   getCar: (id) ->
     @cars.get(id)

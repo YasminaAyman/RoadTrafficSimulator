@@ -1,6 +1,8 @@
 'use strict'
 
 {PI} = Math
+{random} = Math
+
 require '../helpers'
 $ = require 'jquery'
 _ = require 'underscore'
@@ -14,13 +16,22 @@ ToolRoadBuilder = require './road-builder'
 ToolHighlighter = require './highlighter'
 Zoomer = require './zoomer'
 settings = require '../settings'
+Car = require '../model/car'
+Pool = require '../model/pool'
+
 
 class Visualizer
   constructor: (@world) ->
     @$canvas = $('#canvas')
     @canvas = @$canvas[0]
     @ctx = @canvas.getContext('2d')
-
+    @hosp_x = 0
+    @hosp_y = 0
+    @police_x = 0
+    @police_y = 0
+    @fire_x = 0
+    @fire_y = 0
+    @hosp_road = null
     @updateCanvasSize()
     @zoomer = new Zoomer 4, this, true
     @graphics = new Graphics @ctx
@@ -32,6 +43,11 @@ class Visualizer
     @previousTime = 0
     @timeFactor = settings.defaultTimeFactor
     @debug = false
+    @decide = false
+    @accident = false
+    @police = false
+    @fire= false
+
 
   drawIntersection: (intersection, alpha) ->
     color = intersection.color or settings.colors.intersection
@@ -140,18 +156,66 @@ class Visualizer
         @graphics.drawCurve curve, 0.1, 'red'
       @ctx.restore()
 
+
+
   drawGrid: ->
     gridSize = settings.gridSize
     box = @zoomer.getBoundingBox()
     return if box.area() >= 2000 * gridSize * gridSize
     sz = 0.4
+    for i in [box.left()..box.right()] by 7
+      for j in [box.top()..box.bottom()] by 7
+        # rect = new Rect i - sz / 2, j - sz / 2, sz, sz
+        # @graphics.fillRect rect, settings.colors.gridPoint
+        for id, road of @world.roads.all()
+          if ((i >= road.sourceSide.source.x && i <= road.sourceSide.target.x && j >= road.targetSide.target.y && j <= road.sourceSide.source.y ))   
+            rect = new Rect i- sz/2 , j-sz/2  , sz, sz
+            @graphics.fillRect rect, settings.colors.lights
+            unless ((j == road.targetSide.target.y) || ( j== road.sourceSide.target.y) || road.intersec == 1)
+              rect = new Rect i+7,j  ,5,5
+              @graphics.fillOneRect rect, settings.colors.house
+              rect1 = new Rect i-21,j  ,5,5
+              @graphics.fillOneRect rect1, settings.colors.house
+              rand = random()
+              if rand > 0.5 && @decide == false
+                @hosp_x=i
+                @hosp_y=j
+                @decide = true
+                @hosp_road = road
+              if  rand > 0.5 &&rand > 0.5 &&@police == false && @decide == true && i!= @hosp_x
+                @police_x=i
+                @police_y=j
+                @police = true
+              if rand > 0.5 && @fire == false && @decide == true && i!= @police_x && i != @hosp_x
+                @fire_x=i
+                @fire_y=j
+                @fire = true
+              #break
+            
+          if ( i >= road.targetSide.target.x && i <= road.sourceSide.source.x && j >= road.targetSide.source.y && j <= road.targetSide.target.y )
+            rect = new Rect i - sz/2 , j-sz/2 , sz, sz
+            @graphics.fillRect rect, settings.colors.lights
 
-    for i in [box.left()..box.right()] by gridSize
-      for j in [box.top()..box.bottom()] by gridSize
-        rect = new Rect i - sz / 2, j - sz / 2, sz, sz
-        @graphics.fillRect rect, settings.colors.gridPoint
+            
+    rect1 = new Rect @hosp_x+7,@hosp_y  ,5,5
+    @graphics.fillRect rect1, settings.colors.hospital
+
+    rect2 = new Rect @police_x+7,@police_y  ,5,5
+    @graphics.fillRect rect2, settings.colors.police
+
+    rect3 = new Rect @fire_x+7,@fire_y  ,5,5
+    @graphics.fillRect rect3, settings.colors.fire
+
+    
+
+          
+
+  drawBuilding: (building) ->
+
+
 
   updateCanvasSize: ->
+
     if @$canvas.attr('width') isnt $(window).width or
     @$canvas.attr('height') isnt $(window).height
       @$canvas.attr
@@ -168,22 +232,30 @@ class Visualizer
       @graphics.clear settings.colors.background
       @graphics.save()
       @zoomer.transform()
-      @drawGrid()
       for id, intersection of @world.intersections.all()
         @drawIntersection intersection, 0.9
       @drawRoad road, 0.9 for id, road of @world.roads.all()
+      @drawBuilding building for id, building of @world.buildings.all()
       @drawSignals road for id, road of @world.roads.all()
       @drawCar car for id, car of @world.cars.all()
+      @drawGrid()
       @toolIntersectionBuilder.draw() # TODO: all tools
       @toolRoadbuilder.draw()
       @toolHighlighter.draw()
       @graphics.restore()
     window.requestAnimationFrame @draw if @running
 
+
   @property 'running',
     get: -> @_running
     set: (running) ->
       if running then @start() else @stop()
+
+  @property 'accident',
+    get: -> @_accident
+    set: (accident) ->
+      console.log("heree ##!!!!!!!!!!!!!!!!!!!")
+      if accident then @removeAllCars() else @continueCars()
 
   start: ->
     unless @_running
@@ -192,5 +264,25 @@ class Visualizer
 
   stop: ->
     @_running = false
+
+  removeAllCars: ->
+    unless @_accident
+      @_accident = true
+      @world.carsNumber = 1
+      roadHospital= @world.hosproad
+      lane = _.sample roadHospital.lanes
+        # for k in [0..road.lanesNumber - 1]
+        #   r= road.lane[k]
+        #   #if(( i <= r.rightBorder.source.x && i>= r.rightBorder.target.x && j== r.rightBorder.target.y) ||(( i >= r.rightBorder.source.x && i<= r.rightBorder.target.x && j== r.rightBorder.target.y)) || (( j <= r.rightBorder.source.y && j>= r.rightBorder.target.y && i== r.rightBorder.target.x)) || (( j <= r.rightBorder.source.y && j>= r.rightBorder.target.y && i== r.rightBorder.target.x))) || ((( i <= r.leftBorder.source.x && i>= r.leftBorder.target.x && j== r.leftBorder.target.y) ||(( i >= r.leftBorder.source.x && i<= r.leftBorder.target.x && j== r.leftBorder.target.y)) || (( j <= r.leftBorder.source.y && j>= r.leftBorder.target.y && i== r.leftBorder.target.x)) || (( j <= r.leftBorder.source.y && j>= r.leftBorder.target.y && i== r.leftBorder.target.x))))
+      @world.cars = new Pool Car 
+      @world.addCar new Car lane
+      @draw
+
+
+  continueCars: ->
+    console.log("thereeeeeee"+@_accident)
+
+    @world.carsNumber = 20
+    @_accident = false
 
 module.exports = Visualizer

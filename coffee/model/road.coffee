@@ -12,6 +12,7 @@ class Road
     @lanes = []
     @lanesNumber = null
     @update()
+    @intersec = 0
 
   @copy: (road) ->
     result = Object.create Road::
